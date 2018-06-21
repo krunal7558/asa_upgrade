@@ -20,7 +20,7 @@
     - name: Copying file to ASA.
       asa_command:
         commands:
-          - "copy tftp://{{ tftp_server }}{{ file_name }} disk0:/{{ file_name }}"
+          - "copy /noconfirm tftp://{{ tftp_server }}{{ file_name }} disk0:/{{ file_name }}"
       register: file_transfer
 
     - name: Verifying checksum.

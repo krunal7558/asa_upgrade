@@ -1,0 +1,4 @@
+ansible.log
+vault/secret.yml
+.vault_pass.txt
+*.retry
