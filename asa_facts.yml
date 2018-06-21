@@ -10,9 +10,20 @@
     - name: Collecing software versions.
       asa_command:
         commands:
-          - show version | in ASA
+          - show version
       register: asa_ver
-    - name: Backingup running config.
+    - set_fact:
+        show_ver: "{{ asa_ver.stdout[0] | parse_cli_textfsm('templates/cisco_asa_show_version.template') }}"
+    - name: Backing up running config.
       asa_config:
         backup: yes
         save: yes
+  post_tasks:
+    - name: Create CSV file with software verision.
+      lineinfile:
+        dest: ./asa_inventory.csv
+        line: "{{ inventory_hostname }},{{ show_ver[0].IMAGE }}, {{ show_ver[0].LICENSE_MODE }}, {{ show_ver[0].SERIAL }}, {{ show_ver[0].VERSION }}"
+        create: yes
+        state: present
+      deligate_to: localhost
+
