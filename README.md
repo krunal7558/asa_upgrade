@@ -6,7 +6,7 @@ Set of playbooks to automate ASA software upgrade.
 
 Notable files and directories:
 
-* hosts: Ansible inventory file. List of ASA firewalls. 
+* hosts: Ansible inventory file. List of ASA firewalls hostnname and IP addresses in ansible_host variable. 
 
 * ansible.cfg: Ansible configuration file. I had set connect_timeout = 300 so file trasnfer can take upto 5mins only. 
 
@@ -14,7 +14,7 @@ Notable files and directories:
 
 * templates/*: TextFSM templates for ASA Stolen from ntc-templates. 
 
-* vars/*: Generic variable files. 
+* vars/*: Generic variable files. Currently empty
 
 * backup/*: backup of running configs.
 
@@ -59,3 +59,6 @@ Change file mode so only you can read it
 ```asa_facts.yml```: Playbook to collect hostname, software and hardware info and create CSV file. It also backs up running configuration. 
 
 ```asa_upgrade.yml```: Playbooks to copy new image to ASA, verify checksum, set new bootvar and reload the firewall. 
+
+
+

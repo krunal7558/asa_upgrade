@@ -6,12 +6,14 @@
   become_method: enable
   vars:
     tftp_server: 172.16.97.221   # TFTP server IP
-    file_name: /home/root/tftp/asa871-8-smp-k8.bin   # Full path of ASA image to upload
+    file_name: asa871-8-smp-k8.bin # Name of the bin file   
+    path_to_file: /home/root/     # Full path of ASA image to upload
     md5_hash: 12sadr4sdfd4fmvo4w34f343452345   # MD5 hash of this image. 
   vars_files:
     - ./vault/secret.yml
   tasks:
-    - name: Enable SCP on ASA
+    - name: Enable SCP on ASA. 
+      # this task is not needed if SCP is not used to transport .bin file to firewall.
       asa_config:
         lines:
           - ssh scopy enable
@@ -20,7 +22,8 @@
     - name: Copying file to ASA.
       asa_command:
         commands:
-          - "copy /noconfirm tftp://{{ tftp_server }}{{ file_name }} disk0:/{{ file_name }}"
+          # currently uses TFTP but can be modufied to use SCP instead. 
+          - "copy /noconfirm tftp://{{ tftp_server }}{{path_to_file}}{{ file_name }} disk0:/{{ file_name }}"
       register: file_transfer
 
     - name: Verifying checksum.
