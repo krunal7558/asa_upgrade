@@ -1,0 +1,44 @@
+---
+- name: Upgrading ASA firewalls.
+  hosts: all
+  connection: network_cli
+  become: yes
+  become_method: enable
+  vars:
+    tftp_server: 172.16.97.221   # TFTP server IP
+    file_name: /home/root/tftp/asa871-8-smp-k8.bin   # Full path of ASA image to upload
+    md5_hash: 12sadr4sdfd4fmvo4w34f343452345   # MD5 hash of this image. 
+  vars_files:
+    - ./vault/secret.yml
+  tasks:
+    - name: Enable SCP on ASA
+      asa_config:
+        lines:
+          - ssh scopy enable
+      save: yes   # Copy run to start
+
+    - name: Copying file to ASA.
+      asa_command:
+        commands:
+          - "copy tftp://{{ tftp_server }}{{ file_name }} disk0:/{{ file_name }}"
+      register: file_transfer
+
+    - name: Verifying checksum.
+      asa_command:
+        commands:
+          - "verify /md5 disk0:{{ file_name }} {{ md5_hash }}"
+        wait_for: result[0] contains "Verified"    # Ensure MD5 hash is verified. 
+
+    - name: Updating boot image.
+      asa_config:
+        lines:
+          - "boot system disk0:/{{ file_name }}"
+      save: yes # save running config to startup config
+
+    - name: Reloading the system
+      asa_command:
+        commands:
+          - reload noconfirm reason "Upgrading Firewall."
+
+
+
