@@ -4,6 +4,7 @@
   connection: network_cli
   become: yes
   become_method: enable
+  serial: 5
   vars:
     tftp_server: 172.16.97.221   # TFTP server IP
     file_name: asa871-8-smp-k8.bin # Name of the bin file   
@@ -26,7 +27,7 @@
           - "copy /noconfirm tftp://{{ tftp_server }}{{path_to_file}}{{ file_name }} disk0:/{{ file_name }}"
       register: file_transfer
 
-    - name: Verifying checksum.
+    - name: Verifying software image integrity.
       asa_command:
         commands:
           - "verify /md5 disk0:{{ file_name }} {{ md5_hash }}"
@@ -37,6 +38,13 @@
         lines:
           - "boot system disk0:/{{ file_name }}"
       save: yes # save running config to startup config
+
+    - name: Check boot variable. 
+      asa_command:
+        commands:
+          - show bootvar
+      register: bootvar
+    - debug var=bootvar.stdout[0]
 
     - name: Reloading the system
       asa_command:

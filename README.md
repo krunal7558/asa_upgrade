@@ -18,8 +18,6 @@ Notable files and directories:
 
 * backup/*: backup of running configs.
 
-* library/*: list of support code e.g. python code, textfsm templates etc.
-
 * vault/*: Encrypted files created using ansible-vault. 
 
 ## Steps to create vault file to store username and password.
@@ -56,9 +54,14 @@ Change file mode so only you can read it
 
 ## Playbooks:
 
-```asa_facts.yml```: Playbook to collect hostname, software and hardware info and create CSV file. It also backs up running configuration. 
+```asa_facts.yml```: Playbook to collect hostname, software and hardware info and create CSV file. It also backs up running configuration. This playbook can be run against same firewall which 
+needs to be upgraded as pre and post checks.
+ 
+```/asa_upgrade$ ansible-playbook asa_facts.yml```
 
-```asa_upgrade.yml```: Playbooks to copy new image to ASA, verify checksum, set new bootvar and reload the firewall. 
 
+```asa_upgrade.yml```: Playbooks to copy new image to ASA(this casn be done using SCP and TFTP) , verify checksum, set new bootvar and reload the firewall. ```serial: 5``` parameter indicates 
+how many firewall can be upgraded at any given time to minimize impact. 
 
+```/asa_upgrade$ ansible-playbook asa_upgrade.yml```
 
