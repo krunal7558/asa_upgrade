@@ -1,3 +1,4 @@
+#!/usr/local/bin/ansible-playbook
 ---
 - name: Upgrading ASA firewalls.
   hosts: all
@@ -7,10 +8,11 @@
   serial: 5
   vars:
     tftp_server: 172.16.97.221   # TFTP server IP
-    file_name: asa871-8-smp-k8.bin # Name of the bin file   
-    path_to_file: /home/root/     # Full path of ASA image to upload
+    file_name: asa871-8-smp-k8.bin  # Name of the bin file   
+    path_to_file: /home/root/   # Full path of ASA image to upload
     md5_hash: 12sadr4sdfd4fmvo4w34f343452345   # MD5 hash of this image. 
   vars_files:
+    # Include vault file
     - ./vault/secret.yml
   tasks:
     - name: Enable SCP on ASA. 
@@ -37,14 +39,14 @@
       asa_config:
         lines:
           - "boot system disk0:/{{ file_name }}"
-      save: yes # save running config to startup config
+      save: yes   # save running config to startup config
 
     - name: Check boot variable. 
       asa_command:
         commands:
           - show bootvar
       register: bootvar
-    - debug var=bootvar.stdout[0]
+    - debug: var=bootvar.stdout[0]
 
     - name: Reloading the system
       asa_command:
